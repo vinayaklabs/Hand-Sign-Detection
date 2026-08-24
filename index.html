@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Makes the page work well on different screen sizes -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Hand Sign Detection</title>
+
+    <style>
+
+        /* -----------------------------
+           Basic page settings
+        ----------------------------- */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #F4F4F5;
+            color: #1F2328;
+            font-family: Arial, Helvetica, sans-serif;
+
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 20px;
+        }
+
+
+        /* -----------------------------
+           Main card
+        ----------------------------- */
+
+        .card {
+            width: 100%;
+            max-width: 500px;
+
+            background: white;
+
+            border: 1px solid #D9D9DE;
+            border-radius: 10px;
+
+            padding: 30px;
+        }
+
+
+        /* -----------------------------
+           Small heading
+        ----------------------------- */
+
+        .status {
+            color: #5B616E;
+
+            font-size: 12px;
+            font-weight: bold;
+
+            text-transform: uppercase;
+
+            margin-bottom: 12px;
+        }
+
+
+        /* -----------------------------
+           Main heading
+        ----------------------------- */
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+
+        /* -----------------------------
+           Description
+        ----------------------------- */
+
+        .description {
+            color: #5B616E;
+
+            font-size: 15px;
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* -----------------------------
+           Buttons
+        ----------------------------- */
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            width: 100%;
+
+            padding: 13px;
+
+            border: none;
+            border-radius: 6px;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .primary-button {
+            background: #2563EB;
+            color: white;
+        }
+
+        .primary-button:hover {
+            background: #1D4ED8;
+        }
+
+        .secondary-button {
+            background: white;
+            color: #1F2328;
+
+            border: 1px solid #C9CDD4;
+        }
+
+        .secondary-button:hover {
+            background: #F0F0F2;
+        }
+
+        .danger-button {
+            background: #D64545;
+            color: white;
+        }
+
+        .danger-button:hover {
+            background: #B83232;
+        }
+
+
+        /* -----------------------------
+           Hide screens
+        ----------------------------- */
+
+        .screen {
+            display: none;
+        }
+
+
+        /* Show current screen */
+
+        .screen.active {
+            display: block;
+        }
+
+
+        /* -----------------------------
+           Camera
+        ----------------------------- */
+
+        video {
+            width: 100%;
+
+            aspect-ratio: 4 / 3;
+
+            background: black;
+
+            border-radius: 6px;
+
+            object-fit: cover;
+
+            margin-bottom: 15px;
+        }
+
+
+        /* -----------------------------
+           Detected sign box
+        ----------------------------- */
+
+        .sign-box {
+            background: #F4F4F5;
+
+            border: 1px solid #D9D9DE;
+
+            border-radius: 6px;
+
+            padding: 15px;
+
+            margin-bottom: 15px;
+        }
+
+        .sign-title {
+            font-size: 11px;
+
+            color: #5B616E;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+
+            margin-bottom: 5px;
+        }
+
+        .sign-text {
+            font-size: 20px;
+
+            font-weight: bold;
+        }
+
+
+        /* -----------------------------
+           Information boxes
+        ----------------------------- */
+
+        .info {
+            background: #F4F4F5;
+
+            border-radius: 6px;
+
+            padding: 15px;
+
+            margin-top: 20px;
+        }
+
+        .info h2 {
+            font-size: 16px;
+
+            margin-bottom: 8px;
+        }
+
+        .info p {
+            color: #5B616E;
+
+            font-size: 13px;
+
+            line-height: 1.5;
+        }
+
+
+        /* -----------------------------
+           Error message
+        ----------------------------- */
+
+        .error {
+            color: #D64545;
+
+            font-size: 13px;
+
+            margin-top: 15px;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+    <!-- =================================
+         SCREEN 1
+         Permission screen
+    ================================== -->
+
+    <div class="screen active" id="permissionScreen">
+
+        <div class="status">
+            Permission Required
+        </div>
+
+        <h1>
+            Hand Sign Detection
+        </h1>
+
+        <p class="description">
+            Welcome to SignSpeak. Allow camera access
+            so the application can detect your hand signs
+            and convert them into text.
+        </p>
+
+
+        <div class="button-row">
+
+            <button
+                class="secondary-button"
+                onclick="denyCamera()">
+
+                Not Now
+
+            </button>
+
+
+            <button
+                class="primary-button"
+                onclick="allowCamera()">
+
+                Allow Camera
+
+            </button>
+
+        </div>
+
+
+        <div class="info">
+
+            <h2>
+                About SignSpeak
+            </h2>
+
+            <p>
+                SignSpeak uses your camera to detect hand
+                signs. The detected sign will appear on
+                the screen as text.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================
+         SCREEN 2
+         Camera ready
+    ================================== -->
+
+    <div class="screen" id="readyScreen">
+
+        <div class="status">
+            Camera Access Granted
+        </div>
+
+        <h1>
+            You're All Set
+        </h1>
+
+        <p class="description">
+            Your camera is ready. Click the button below
+            to start hand sign detection.
+        </p>
+
+
+        <button
+            class="primary-button"
+            onclick="openCamera()">
+
+            Open Camera
+
+        </button>
+
+
+        <div class="info">
+
+            <h2>
+                How it works
+            </h2>
+
+            <p>
+                1. Open the camera.<br>
+                2. Show a hand sign.<br>
+                3. SignSpeak detects the sign.<br>
+                4. The detected sign appears as text.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================
+         SCREEN 3
+         Camera denied
+    ================================== -->
+
+    <div class="screen" id="blockedScreen">
+
+        <div class="status">
+            Camera Access Off
+        </div>
+
+        <h1>
+            Camera is Turned Off
+        </h1>
+
+        <p class="description">
+            SignSpeak needs camera access to detect
+            hand signs.
+        </p>
+
+
+        <button
+            class="primary-button"
+            onclick="openCamera()">
+
+            Try Camera Again
+
+        </button>
+
+
+        <p class="error" id="errorText"></p>
+
+    </div>
+
+
+
+    <!-- =================================
+         SCREEN 4
+         Live camera
+    ================================== -->
+
+    <div class="screen" id="cameraScreen">
+
+        <div class="status">
+            Live Camera
+        </div>
+
+        <h1>
+            Hand Sign Detection
+        </h1>
+
+
+        <!-- Camera video -->
+
+        <video
+            id="camera"
+            autoplay
+            playsinline
+            muted>
+        </video>
+
+
+        <!-- Detected sign -->
+
+        <div class="sign-box">
+
+            <div class="sign-title">
+                Detected Sign
+            </div>
+
+            <div
+                class="sign-text"
+                id="detectedSign">
+
+                Waiting for a hand sign...
+
+            </div>
+
+        </div>
+
+
+        <!-- Stop camera -->
+
+        <button
+            class="danger-button"
+            onclick="stopCamera()">
+
+            Stop Camera
+
+        </button>
+
+
+        <div class="info">
+
+            <h2>
+                SignSpeak
+            </h2>
+
+            <p>
+                Show your hand clearly in front of the
+                camera. The sign detection result will
+                appear above.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================
+         SCREEN 5
+         Camera error
+    ================================== -->
+
+    <div class="screen" id="errorScreen">
+
+        <div class="status">
+            Camera Error
+        </div>
+
+        <h1>
+            Camera Access Failed
+        </h1>
+
+        <p class="description" id="errorMessage">
+            SignSpeak could not access your camera.
+        </p>
+
+
+        <button
+            class="primary-button"
+            onclick="openCamera()">
+
+            Try Again
+
+        </button>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+    // -----------------------------------------
+    // Get the different screens
+    // -----------------------------------------
+
+    const permissionScreen =
+        document.getElementById("permissionScreen");
+
+    const readyScreen =
+        document.getElementById("readyScreen");
+
+    const blockedScreen =
+        document.getElementById("blockedScreen");
+
+    const cameraScreen =
+        document.getElementById("cameraScreen");
+
+    const errorScreen =
+        document.getElementById("errorScreen");
+
+
+    // Get camera video element
+
+    const camera =
+        document.getElementById("camera");
+
+
+    // Store camera stream
+
+    let cameraStream = null;
+
+
+
+    // -----------------------------------------
+    // Show only one screen
+    // -----------------------------------------
+
+    function showScreen(screen) {
+
+        permissionScreen.classList.remove("active");
+        readyScreen.classList.remove("active");
+        blockedScreen.classList.remove("active");
+        cameraScreen.classList.remove("active");
+        errorScreen.classList.remove("active");
+
+        screen.classList.add("active");
+    }
+
+
+
+    // -----------------------------------------
+    // User clicks "Allow Camera"
+    // -----------------------------------------
+
+    async function allowCamera() {
+
+        try {
+
+            // Ask browser for camera permission
+
+            const temporaryStream =
+                await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+
+
+            // Stop the temporary camera
+
+            temporaryStream
+                .getTracks()
+                .forEach(track => track.stop());
+
+
+            // Permission was granted
+
+            showScreen(readyScreen);
+
+        }
+
+        catch (error) {
+
+            console.log(error);
+
+            document.getElementById("errorMessage").textContent =
+                "Camera permission was denied. " +
+                "Please allow camera access in your browser settings.";
+
+            showScreen(errorScreen);
+        }
+    }
+
+
+
+    // -----------------------------------------
+    // User clicks "Not Now"
+    // -----------------------------------------
+
+    function denyCamera() {
+
+        showScreen(blockedScreen);
+    }
+
+
+
+    // -----------------------------------------
+    // Open camera
+    // -----------------------------------------
+
+    async function openCamera() {
+
+        try {
+
+            cameraStream =
+                await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: false
+                });
+
+
+            // Put camera stream inside video element
+
+            camera.srcObject = cameraStream;
+
+
+            // Show camera screen
+
+            showScreen(cameraScreen);
+
+        }
+
+        catch (error) {
+
+            console.log(error);
+
+            document.getElementById("errorMessage").textContent =
+                "Could not access the camera. " +
+                "Please check your browser camera permissions.";
+
+            showScreen(errorScreen);
+        }
+    }
+
+
+
+    // -----------------------------------------
+    // Stop camera
+    // -----------------------------------------
+
+    function stopCamera() {
+
+        if (cameraStream != null) {
+
+            cameraStream
+                .getTracks()
+                .forEach(track => track.stop());
+
+            cameraStream = null;
+        }
+
+
+        // Return to ready screen
+
+        showScreen(readyScreen);
+    }
+
+
+
+    // -----------------------------------------
+    // Change detected sign
+    // -----------------------------------------
+
+    function showDetectedSign(sign) {
+
+        document.getElementById("detectedSign").textContent = sign;
+    }
+
+
+    // Example:
+    //
+    // showDetectedSign("HELLO");
+    //
+    // Later, your Python/AI sign detector
+    // can provide the actual detected sign.
+
+
+</script>
+
+
+</body>
+
+</html>
