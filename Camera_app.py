@@ -2,21 +2,46 @@ import cv2
 import threading
 import joblib
 import mediapipe as mp
+import os
+import numpy as np
 
 from skimage.feature import hog
 
 
 # ==========================================
-# LOAD TRAINED MODEL
+# MODEL SETTINGS
 # ==========================================
 
 MODEL_PATH = "asl_model.pkl"
 
-model_data = joblib.load(MODEL_PATH)
+model = None
+classes = []
+IMG_SIZE = (64, 64)
 
-model = model_data["model"]
-classes = model_data["classes"]
-IMG_SIZE = tuple(model_data["img_size"])
+# Try to load model if it exists
+if os.path.exists(MODEL_PATH):
+
+    try:
+
+        model_data = joblib.load(MODEL_PATH)
+
+        model = model_data["model"]
+        classes = model_data.get("classes", [])
+        IMG_SIZE = tuple(model_data.get("img_size", (64, 64)))
+
+        print("Trained model loaded successfully.")
+
+    except Exception as e:
+
+        print("Could not load trained model.")
+        print("Error:", e)
+        model = None
+
+else:
+
+    print("No trained model found.")
+    print("Camera will work, but sign recognition is disabled.")
+    print("Run Train_Model.py after collecting training data.")
 
 
 # ==========================================
@@ -50,7 +75,6 @@ lock = threading.Lock()
 # ==========================================
 
 def _open_capture():
-    """Open the webcam."""
 
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
@@ -67,11 +91,13 @@ def _open_capture():
 # ==========================================
 
 def start_camera():
+
     global camera, camera_active
 
     with lock:
 
         if camera is None or not camera.isOpened():
+
             camera = _open_capture()
 
         camera_active = True
@@ -82,9 +108,11 @@ def start_camera():
 # ==========================================
 
 def stop_camera():
+
     global camera_active
 
     with lock:
+
         camera_active = False
 
 
@@ -93,6 +121,7 @@ def stop_camera():
 # ==========================================
 
 def release_camera():
+
     global camera, camera_active
 
     with lock:
@@ -100,6 +129,7 @@ def release_camera():
         camera_active = False
 
         if camera is not None:
+
             camera.release()
             camera = None
 
@@ -136,7 +166,6 @@ def get_hand_box(frame):
 
     height, width = frame.shape[:2]
 
-    # MediaPipe expects RGB
     rgb_frame = cv2.cvtColor(
         frame,
         cv2.COLOR_BGR2RGB
@@ -145,6 +174,7 @@ def get_hand_box(frame):
     results = hands.process(rgb_frame)
 
     if not results.multi_hand_landmarks:
+
         return None
 
     hand_landmarks = results.multi_hand_landmarks[0]
@@ -162,14 +192,13 @@ def get_hand_box(frame):
             int(landmark.y * height)
         )
 
-    # Find hand boundaries
     x_min = max(0, min(x_coordinates))
     y_min = max(0, min(y_coordinates))
 
     x_max = min(width, max(x_coordinates))
     y_max = min(height, max(y_coordinates))
 
-    # Add padding around hand
+    # Padding around hand
     padding = 30
 
     x1 = max(0, x_min - padding)
@@ -178,8 +207,8 @@ def get_hand_box(frame):
     x2 = min(width, x_max + padding)
     y2 = min(height, y_max + padding)
 
-    # Make sure the box is not too small
     if (x2 - x1) < 40 or (y2 - y1) < 40:
+
         return None
 
     return x1, y1, x2, y2
@@ -195,6 +224,7 @@ def detect_hand_sign(frame):
 
     # No hand
     if hand_box is None:
+
         return "No hand detected", 0.0, None
 
     x1, y1, x2, y2 = hand_box
@@ -203,35 +233,59 @@ def detect_hand_sign(frame):
     roi = frame[y1:y2, x1:x2]
 
     if roi.size == 0:
+
         return "No hand detected", 0.0, None
 
-    # Extract HOG features
+    # --------------------------------------
+    # MODEL NOT AVAILABLE
+    # --------------------------------------
+
+    if model is None:
+
+        return "Model not trained", 0.0, hand_box
+
+    # --------------------------------------
+    # EXTRACT FEATURES
+    # --------------------------------------
+
     features = extract_hog(roi)
 
-    # Prediction
+    # --------------------------------------
+    # PREDICTION
+    # --------------------------------------
+
     prediction = model.predict([features])[0]
 
     # --------------------------------------
-    # Confidence-like score
+    # CONFIDENCE-LIKE SCORE
     # --------------------------------------
 
-    decision_scores = model.decision_function([features])
+    confidence = 0.0
 
-    if decision_scores.ndim == 2:
+    try:
 
-        scores = decision_scores[0]
-
-        # Convert decision values into a
-        # confidence-like percentage
-        exp_scores = __import__("numpy").exp(
-            scores - scores.max()
+        decision_scores = model.decision_function(
+            [features]
         )
 
-        probabilities = exp_scores / exp_scores.sum()
+        if decision_scores.ndim == 2:
 
-        confidence = probabilities.max() * 100
+            scores = decision_scores[0]
 
-    else:
+            # Prevent numerical overflow
+            exp_scores = np.exp(
+                scores - scores.max()
+            )
+
+            probabilities = (
+                exp_scores / exp_scores.sum()
+            )
+
+            confidence = (
+                probabilities.max() * 100
+            )
+
+    except Exception:
 
         confidence = 0.0
 
@@ -254,11 +308,13 @@ def generate_frames():
             cam = camera
 
         if not active or cam is None:
+
             break
 
         success, frame = cam.read()
 
         if not success:
+
             break
 
         # Mirror camera
@@ -268,9 +324,12 @@ def generate_frames():
         # DETECT SIGN
         # ==================================
 
-        sign, confidence, hand_box = detect_hand_sign(frame)
+        sign, confidence, hand_box = detect_hand_sign(
+            frame
+        )
 
         with lock:
+
             latest_sign = sign
 
         # ==================================
@@ -290,12 +349,20 @@ def generate_frames():
                 2
             )
 
-            # Text shown above hand
-            label = f"{sign}  {confidence:.1f}%"
+            # ----------------------------------
+            # MODEL NOT TRAINED
+            # ----------------------------------
+
+            if sign == "Model not trained":
+
+                label = "Model not trained"
+
+            else:
+
+                label = f"{sign}  {confidence:.1f}%"
 
             text_y = max(30, y1 - 10)
 
-            # Black background behind text
             text_size = cv2.getTextSize(
                 label,
                 cv2.FONT_HERSHEY_SIMPLEX,
@@ -303,10 +370,17 @@ def generate_frames():
                 2
             )[0]
 
+            # Black background
             cv2.rectangle(
                 frame,
-                (x1, text_y - text_size[1] - 10),
-                (x1 + text_size[0] + 10, text_y + 5),
+                (
+                    x1,
+                    text_y - text_size[1] - 10
+                ),
+                (
+                    x1 + text_size[0] + 10,
+                    text_y + 5
+                ),
                 (0, 0, 0),
                 -1
             )
@@ -345,6 +419,7 @@ def generate_frames():
         )
 
         if not ret:
+
             continue
 
         frame_bytes = buffer.tobytes()
@@ -364,4 +439,5 @@ def generate_frames():
 def get_latest_sign():
 
     with lock:
+
         return latest_sign
