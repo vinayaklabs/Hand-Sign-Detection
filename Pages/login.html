@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignSpeak - Login</title>
+  <style>
+    * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+    body {
+    margin: 0;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .heading {
+    padding-left: 87.5px;
+  }
+    .login-box {
+      width: 350px;
+      padding: 30px;
+      border: 1px solid #e2e2e6;
+      border-radius: 10px;
+    }
+
+    .login-box h1 {
+      align-items: center;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .login-box p {
+      color: #5b616e; 
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .login-btn {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .login-box .subtitle { 
+      color: #5b616e; 
+      font-size: 14px; 
+      margin-bottom: 28px; 
+    }
+
+    .form-input  {
+      margin-bottom: 18px;
+    }
+
+    .form-input label {
+      display: block; 
+      font-size: 14px; 
+      font-weight: bold; 
+      margin-bottom: 7px;
+    }
+
+    .form-input input {
+      display: block; 
+      width: 100%; 
+      height: 42px; 
+      padding: 10px 12px; 
+      border: 1px solid #d1d5db; 
+      border-radius: 6px; 
+      font-size: 14px; 
+      outline: none;
+    }
+
+    .form-input input:focus { 
+      border-color: #2563eb; 
+    }
+
+    .login-btn {
+      display: block; 
+      width: 100%; 
+      height: 42px; 
+      margin-top: 5px; 
+      background: #2563eb; 
+      color: white; 
+      border: none; 
+      border-radius: 6px; 
+      font-size: 15px; 
+      font-weight: bold; 
+      cursor: pointer; 
+    }
+
+    .login-btn:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+
+
+<body>
+
+  <div class="login-container">
+  
+    <div class="heading">
+      <h1>SignSpeak</h1>
+      <p class="subtitle">Login To Continue</p>
+    </div>
+  
+  <div class="login-box">
+
+
+  <form method="POST" action="/signup">
+
+    <div class="form-input">
+      <label for="name">Name</label>
+      <input 
+        type="text"
+        id="name"
+        name="name"
+        placeholder="Enter Your Full Name"
+        required
+      >
+    </div>
+
+    <div class="form-input">
+      <label for="email">Email</label>
+      <input 
+        type="email"
+        id="email"
+        name="email"
+        placeholder="Enter Your Email"
+        required
+      >
+    </div>
+
+    <div class="form-input">
+      <label for="password">Password</label>
+      <input 
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Enter Your Password"
+        required
+      >
+    </div>
+
+    <button class="login-btn" type="submit">
+      Create Account
+    </button>
+
+  </form>
+
+    </div>
+  </div>
+</body>
+</html>

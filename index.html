@@ -19,20 +19,46 @@
     }
  
     header {
+        display: flex;
+        align-items: center;
         padding: 25px 40px;
         border-bottom: 1px solid #e2e2e6;
     }
- 
+
+    .header-title {
+        text-align: left;
+    }
+
     header h1 {
         font-size: 28px;
         margin-bottom: 5px;
     }
- 
+
     header p {
         font-size: 14px;
         color: #5b616e;
     }
- 
+
+    .nav-buttons {
+        margin-left: auto;
+        display: flex;
+        gap: 39px;
+    }
+
+    .btn:hover {
+        background: #00BFA5;
+    }
+
+    .auth-buttons {
+        display: flex;
+        gap: 8px;
+        margin-left: 67px;
+    }
+
+    .auth-buttons:hover {
+        background: #00BFA5;
+    }
+
     .main {
         display: flex;
         gap: 25px;
@@ -154,14 +180,31 @@
 </style>
 </head>
 <body>
- 
+
     <header>
-        <h1>SignSpeak</h1>
-        <p>Real Time Hand Sign Detection</p>
+        <div>
+            <img width="120px" height="70px" src="img/logo.png" alt="logo">
+        </div>
+        <div class="header-title">
+            <h1>SignSpeak</h1>
+            <p>Real Time Hand Sign Detection</p>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn" onclick="window.location.href='/'">HOME</button>
+            <button class="btn" onclick="window.location.href='/about'">ABOUT</button>
+            <button class="btn" onclick="window.location.href='/contact-us'">CONTACT US</button>
+        </div>
+
+        <div class="auth-buttons">
+            <button class="btn">SIGN IN</button>
+            <button class="btn" onclick="window.location.href='/login'">LOGIN</button>
+        </div>
+        
     </header>
- 
+
     <div class="main">
- 
+
         <div class="camera-section">
             <div class="controls">
                 <button id="openBtn">Open Camera</button>
@@ -173,7 +216,7 @@
                 <div class="video-placeholder" id="placeholderText">Camera is off</div>
             </div>
         </div>
- 
+
         <div class="meaning-section">
             <h2>Detected Sign</h2>
             <textarea id="meaning" readonly>No hand detected</textarea>
@@ -214,7 +257,7 @@
             // We don't actually use this stream - the video comes from the
             // Flask/OpenCV backend - this just triggers the native prompt.
             if (permissionAsked) return true;
- 
+
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 stream.getTracks().forEach(track => track.stop());
@@ -245,18 +288,18 @@
         closeBtn.addEventListener("click", async () => {
             openBtn.disabled = false;
             closeBtn.disabled = true;
- 
+
             await fetch("/stop_camera", { method: "POST" });
- 
+
             cameraFeed.src = "";
             cameraFeed.style.display = "none";
             placeholderText.style.display = "block";
- 
+
             stopPolling();
             meaningBox.value = "No hand detected";
         });
     </script>
- 
+
 </body>
 </html>
- 
+

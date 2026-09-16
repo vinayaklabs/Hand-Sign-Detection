@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SignSpeak - Home</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            color: #1f2328;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 25px 40px;
+            border-bottom: 1px solid #e2e2e6;
+        }
+
+        header img {
+            width: 120px;
+            height: 70px;
+        }
+
+        .header-title {
+            margin-left: 10px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #5b616e;
+        }
+
+        .nav-buttons {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: #ffffff;
+            color: #1f2328;
+        }
+
+        .btn:hover {
+            background: #00BFA5;
+            color: white;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+            margin-left: 40px;
+        }
+
+        .hero {
+            min-height: calc(100vh - 121px);
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+            padding: 40px;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero h2 span {
+            color: #2563eb;
+        }
+
+        .hero p {
+            max-width: 650px;
+            font-size: 18px;
+            line-height: 1.6;
+            color: #5b616e;
+            margin-bottom: 30px;
+        }
+
+        .start-btn {
+            background: #2563eb;
+            color: white;
+            padding: 14px 30px;
+            font-size: 17px;
+        }
+
+        .start-btn:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 800px) {
+            header {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .nav-buttons {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .auth-buttons {
+                margin-left: auto;
+            }
+
+            .hero h2 {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+
+    <div>
+        <img src="img/logo.png" alt="SignSpeak logo">
+    </div>
+
+    <div class="header-title">
+        <h1>SignSpeak</h1>
+        <p>Real Time Hand Sign Detection</p>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="btn" onclick="window.location.href='/'">HOME</button>
+
+        <button class="btn" onclick="window.location.href='/about'">ABOUT</button>
+
+        <button class="btn" onclick="window.location.href='/contact-us'">CONTACT US</button>
+    </div>
+
+    <div class="auth-buttons">
+        <button class="btn" onclick="window.location.href='/sign-in'">SIGN IN</button>
+
+        <button class="btn" onclick="window.location.href='/login'">
+            LOGIN
+        </button>
+    </div>
+
+</header>
+
+
+<section class="hero">
+
+    <h2>
+        Communicate with <span>SignSpeak</span>
+    </h2>
+
+    <p>
+        SignSpeak is a real-time hand sign detection system
+        that uses your camera to recognize hand signs and
+        convert them into meaningful text.
+    </p>
+
+    <button
+        class="start-btn"
+        onclick="window.location.href='/detect'"
+    >
+        Start Detection
+    </button>
+
+</section>
+
+</body>
+</html>

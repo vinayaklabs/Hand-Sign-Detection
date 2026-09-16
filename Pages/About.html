@@ -1,0 +1,460 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SignSpeak - About</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            color: #1f2328;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+
+        header {
+            display: flex;
+            align-items: center;
+            padding: 25px 40px;
+            border-bottom: 1px solid #e2e2e6;
+        }
+
+        header img {
+            width: 120px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .header-title {
+            margin-left: 10px;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: #5b616e;
+        }
+
+        /* NAVIGATION */
+
+        .nav-buttons {
+            margin-left: auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: #ffffff;
+            color: #1f2328;
+        }
+
+        .btn:hover {
+            background: #00BFA5;
+            color: white;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 8px;
+            margin-left: 40px;
+        }
+
+        /* ABOUT SECTION */
+
+        .about-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .about-heading {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .about-heading h2 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .about-heading h2 span {
+            color: #2563eb;
+        }
+
+        .about-heading p {
+            font-size: 17px;
+            color: #5b616e;
+            line-height: 1.6;
+        }
+
+        /* CONTENT CARDS */
+
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .about-card {
+            border: 1px solid #e2e2e6;
+            border-radius: 10px;
+            padding: 30px;
+            background: #fafafa;
+        }
+
+        .about-card h3 {
+            font-size: 21px;
+            margin-bottom: 15px;
+            color: #2563eb;
+        }
+
+        .about-card p {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #5b616e;
+        }
+
+        /* HOW IT WORKS */
+
+        .how-it-works {
+            margin-top: 40px;
+            border: 1px solid #e2e2e6;
+            border-radius: 10px;
+            padding: 30px;
+        }
+
+        .how-it-works h3 {
+            font-size: 21px;
+            color: #2563eb;
+            margin-bottom: 25px;
+        }
+
+        .steps {
+            display: flex;
+            gap: 20px;
+        }
+
+        .step {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #e2e2e6;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #2563eb;
+            color: white;
+
+            border-radius: 50%;
+            font-weight: bold;
+
+            margin-bottom: 15px;
+        }
+
+        .step h4 {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .step p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #5b616e;
+        }
+
+        /* START BUTTON */
+
+        .start-section {
+            text-align: center;
+            margin-top: 45px;
+        }
+
+        .start-btn {
+            background: #2563eb;
+            color: white;
+            padding: 14px 30px;
+            font-size: 16px;
+        }
+
+        .start-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 800px) {
+
+            header {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .nav-buttons {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .auth-buttons {
+                margin-left: auto;
+            }
+
+            .about-heading h2 {
+                font-size: 34px;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div>
+            <img
+                src="img/logo.png"
+                alt="SignSpeak logo"
+                onclick="window.location.href='/'"
+                style="cursor: pointer;"
+            >
+        </div>
+
+        <div class="header-title">
+            <h1>SignSpeak</h1>
+            <p>Real Time Hand Sign Detection</p>
+        </div>
+
+        <div class="nav-buttons">
+
+        <button class="btn" onclick="window.location.href='/'">HOME</button>
+
+        <button class="btn" onclick="window.location.href='/about'">ABOUT</button>
+
+        <button class="btn" onclick="window.location.href='/contact-us'">CONTACT US</button>
+
+        </div>
+
+        <div class="auth-buttons">
+
+            <button class="btn" onclick="window.location.href='/sign-in'">
+    SIGN IN
+</button>
+
+            <button
+                class="btn"
+                onclick="window.location.href='/login'">
+                LOGIN
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- ABOUT -->
+
+    <main class="about-container">
+
+        <div class="about-heading">
+
+            <h2>About <span>SignSpeak</span></h2>
+
+            <p>
+                Breaking communication barriers through
+                real-time hand sign detection technology.
+            </p>
+
+        </div>
+
+
+        <div class="about-content">
+
+            <div class="about-card">
+
+                <h3>What is SignSpeak?</h3>
+
+                <p>
+                    SignSpeak is a real-time hand sign detection
+                    website designed to recognize hand signs using
+                    a camera and convert them into meaningful text.
+                    The system aims to make communication easier
+                    and more accessible for people who use hand
+                    signs to communicate.
+                </p>
+
+            </div>
+
+
+            <div class="about-card">
+
+                <h3>Our Goal</h3>
+
+                <p>
+                    Our goal is to build a simple and accessible
+                    system that can understand hand signs in
+                    real time. SignSpeak focuses on reducing
+                    communication barriers by providing a
+                    technology-based way to interpret hand signs.
+                </p>
+
+            </div>
+
+
+            <div class="about-card">
+
+                <h3>Real-Time Detection</h3>
+
+                <p>
+                    SignSpeak uses a camera to capture hand
+                    movements. The captured video is processed
+                    by the detection system, which identifies
+                    the corresponding hand sign and displays
+                    the detected result on the screen.
+                </p>
+
+            </div>
+
+
+            <div class="about-card">
+
+                <h3>Simple & Easy to Use</h3>
+
+                <p>
+                    The interface is designed to be simple.
+                    Users can open their camera, show a hand sign,
+                    and view the detected sign without complicated
+                    controls or setup.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- HOW IT WORKS -->
+
+        <div class="how-it-works">
+
+            <h3>How SignSpeak Works</h3>
+
+            <div class="steps">
+
+                <div class="step">
+
+                    <div class="step-number">1</div>
+
+                    <h4>Open Camera</h4>
+
+                    <p>
+                        Start the camera and allow the browser
+                        to access it.
+                    </p>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">2</div>
+
+                    <h4>Show Hand Sign</h4>
+
+                    <p>
+                        Place your hand in front of the camera
+                        and perform a supported hand sign.
+                    </p>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">3</div>
+
+                    <h4>Detect Sign</h4>
+
+                    <p>
+                        The system processes the camera feed
+                        and identifies the detected hand sign.
+                    </p>
+
+                </div>
+
+
+                <div class="step">
+
+                    <div class="step-number">4</div>
+
+                    <h4>View Result</h4>
+
+                    <p>
+                        The detected sign is displayed on the
+                        screen in real time.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- START DETECTION -->
+
+        <div class="start-section">
+
+            <button
+                class="start-btn"
+                onclick="window.location.href='/detect'">
+                Start Detection
+            </button>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>

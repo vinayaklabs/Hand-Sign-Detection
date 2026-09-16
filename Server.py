@@ -1,7 +1,7 @@
-from flask import Flask, send_file, Response, jsonify
+from flask import Flask, send_file, Response, jsonify, request , redirect , send_from_directory
 import webbrowser
 import threading
-
+from database import create_user , login_user
 from Camera_app import generate_frames, get_latest_sign, start_camera, stop_camera
 
 app = Flask(__name__)
@@ -9,8 +9,60 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
+    return send_file("Pages/home.html", mimetype="text/html")
+
+@app.route("/detect")
+def detect():
     return send_file("index.html", mimetype="text/html")
 
+@app.route("/about")
+def about():
+    return send_file("Pages/About.html", mimetype="text/html")
+
+@app.route("/contact-us")
+def contact_us():
+    return send_file("Pages/Contact_Us.html", mimetype="text/html")
+
+@app.route("/img/<path:filename>")
+def serve_image(filename):
+    return send_from_directory("img", filename)
+
+@app.route("/login")
+def login():
+    return send_file("Pages/login.html", mimetype="text/html")
+
+@app.route("/sign-in")
+def Sign_In_page():
+    return send_file("Pages/Sign_In.html", mimetype="text/html")
+
+@app.route("/sign-in" , methods=["POST"])
+def sign_in():
+    
+    email = request.form["email"]
+    password = request.form["password"]
+    
+    name = login_user(email , password)
+    
+    if(name):
+        return redirect("/")
+    
+    else:
+        return "Invalid Email or Password"
+
+@app.route("/signup", methods=["POST"])
+def signup():
+
+    name = request.form["name"]
+    email = request.form["email"]
+    password = request.form["password"]
+
+    success = create_user(name, email, password)
+
+    if success:
+        return redirect("/")
+
+    else:
+        return "Email already exists!"
 
 @app.route("/video_feed")
 def video_feed():
