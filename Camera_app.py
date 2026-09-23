@@ -8,17 +8,18 @@ import numpy as np
 from skimage.feature import hog
 
 
-# ==========================================
-# MODEL SETTINGS
-# ==========================================
+# ============================================================
+# MODEL
+# ============================================================
 
-MODEL_PATH = "asl_model.pkl"
+MODEL_PATH = "asl_model_mediapipe.pkl"
 
 model = None
 classes = []
 IMG_SIZE = (64, 64)
+PADDING = 50
 
-# Try to load model if it exists
+
 if os.path.exists(MODEL_PATH):
 
     try:
@@ -26,41 +27,62 @@ if os.path.exists(MODEL_PATH):
         model_data = joblib.load(MODEL_PATH)
 
         model = model_data["model"]
-        classes = model_data.get("classes", [])
-        IMG_SIZE = tuple(model_data.get("img_size", (64, 64)))
 
-        print("Trained model loaded successfully.")
+        classes = model_data["classes"]
+
+        IMG_SIZE = tuple(
+            model_data.get(
+                "img_size",
+                (64, 64)
+            )
+        )
+
+        PADDING = model_data.get(
+            "padding",
+            50
+        )
+
+        print("===================================")
+        print("MediaPipe model loaded successfully")
+        print("===================================")
+
+        print("Model:", MODEL_PATH)
+        print("Image size:", IMG_SIZE)
+        print("Padding:", PADDING)
+        print("Classes:", len(classes))
 
     except Exception as e:
 
-        print("Could not load trained model.")
+        print("Could not load model.")
         print("Error:", e)
-        model = None
 
 else:
 
-    print("No trained model found.")
-    print("Camera will work, but sign recognition is disabled.")
-    print("Run Train_Model.py after collecting training data.")
+    print("ERROR: Model not found:")
+    print(MODEL_PATH)
 
 
-# ==========================================
-# MEDIAPIPE HAND DETECTION
-# ==========================================
+# ============================================================
+# MEDIAPIPE
+# ============================================================
 
 mp_hands = mp.solutions.hands
 
 hands = mp_hands.Hands(
+
     static_image_mode=False,
+
     max_num_hands=1,
-    min_detection_confidence=0.6,
-    min_tracking_confidence=0.6
+
+    min_detection_confidence=0.5,
+
+    min_tracking_confidence=0.5
 )
 
 
-# ==========================================
-# CAMERA VARIABLES
-# ==========================================
+# ============================================================
+# CAMERA
+# ============================================================
 
 camera = None
 camera_active = False
@@ -70,29 +92,29 @@ latest_sign = "No hand detected"
 lock = threading.Lock()
 
 
-# ==========================================
-# OPEN CAMERA
-# ==========================================
-
 def _open_capture():
 
-    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    cap = cv2.VideoCapture(
+        0,
+        cv2.CAP_DSHOW
+    )
 
     if not cap.isOpened():
+
         cap = cv2.VideoCapture(0)
 
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    cap.set(
+        cv2.CAP_PROP_BUFFERSIZE,
+        1
+    )
 
     return cap
 
 
-# ==========================================
-# START CAMERA
-# ==========================================
-
 def start_camera():
 
-    global camera, camera_active
+    global camera
+    global camera_active
 
     with lock:
 
@@ -103,10 +125,6 @@ def start_camera():
         camera_active = True
 
 
-# ==========================================
-# STOP CAMERA
-# ==========================================
-
 def stop_camera():
 
     global camera_active
@@ -116,13 +134,10 @@ def stop_camera():
         camera_active = False
 
 
-# ==========================================
-# RELEASE CAMERA
-# ==========================================
-
 def release_camera():
 
-    global camera, camera_active
+    global camera
+    global camera_active
 
     with lock:
 
@@ -131,16 +146,20 @@ def release_camera():
         if camera is not None:
 
             camera.release()
+
             camera = None
 
 
-# ==========================================
-# EXTRACT HOG FEATURES
-# ==========================================
+# ============================================================
+# HOG
+# ============================================================
 
 def extract_hog(image):
 
-    image = cv2.resize(image, IMG_SIZE)
+    image = cv2.resize(
+        image,
+        IMG_SIZE
+    )
 
     gray = cv2.cvtColor(
         image,
@@ -148,21 +167,26 @@ def extract_hog(image):
     )
 
     features = hog(
+
         gray,
+
         orientations=9,
+
         pixels_per_cell=(8, 8),
+
         cells_per_block=(2, 2),
+
         block_norm="L2-Hys"
     )
 
     return features
 
 
-# ==========================================
-# DETECT HAND
-# ==========================================
+# ============================================================
+# HAND CROP
+# ============================================================
 
-def get_hand_box(frame):
+def get_hand_data(frame):
 
     height, width = frame.shape[:2]
 
@@ -171,270 +195,317 @@ def get_hand_box(frame):
         cv2.COLOR_BGR2RGB
     )
 
-    results = hands.process(rgb_frame)
+    results = hands.process(
+        rgb_frame
+    )
 
     if not results.multi_hand_landmarks:
 
-        return None
+        return None, None
 
-    hand_landmarks = results.multi_hand_landmarks[0]
 
-    x_coordinates = []
-    y_coordinates = []
+    hand = results.multi_hand_landmarks[0]
 
-    for landmark in hand_landmarks.landmark:
 
-        x_coordinates.append(
+    xs = []
+    ys = []
+
+
+    for landmark in hand.landmark:
+
+        xs.append(
             int(landmark.x * width)
         )
 
-        y_coordinates.append(
+        ys.append(
             int(landmark.y * height)
         )
 
-    x_min = max(0, min(x_coordinates))
-    y_min = max(0, min(y_coordinates))
 
-    x_max = min(width, max(x_coordinates))
-    y_max = min(height, max(y_coordinates))
+    x_min = max(
+        0,
+        min(xs) - PADDING
+    )
 
-    # Padding around hand
-    padding = 30
+    y_min = max(
+        0,
+        min(ys) - PADDING
+    )
 
-    x1 = max(0, x_min - padding)
-    y1 = max(0, y_min - padding)
+    x_max = min(
+        width,
+        max(xs) + PADDING
+    )
 
-    x2 = min(width, x_max + padding)
-    y2 = min(height, y_max + padding)
-
-    if (x2 - x1) < 40 or (y2 - y1) < 40:
-
-        return None
-
-    return x1, y1, x2, y2
+    y_max = min(
+        height,
+        max(ys) + PADDING
+    )
 
 
-# ==========================================
-# DETECT HAND SIGN
-# ==========================================
+    if x_max <= x_min or y_max <= y_min:
 
-def detect_hand_sign(frame):
+        return None, None
 
-    hand_box = get_hand_box(frame)
 
-    # No hand
-    if hand_box is None:
+    roi = frame[
+        y_min:y_max,
+        x_min:x_max
+    ]
 
-        return "No hand detected", 0.0, None
-
-    x1, y1, x2, y2 = hand_box
-
-    # Crop hand
-    roi = frame[y1:y2, x1:x2]
 
     if roi.size == 0:
 
-        return "No hand detected", 0.0, None
+        return None, None
 
-    # --------------------------------------
-    # MODEL NOT AVAILABLE
-    # --------------------------------------
+
+    return (
+        (x_min, y_min, x_max, y_max),
+        roi
+    )
+
+
+# ============================================================
+# PREDICTION
+# ============================================================
+
+def detect_hand_sign(frame):
+
+    hand_box, roi = get_hand_data(
+        frame
+    )
+
+
+    if hand_box is None:
+
+        return (
+            "No hand detected",
+            0.0,
+            None
+        )
+
 
     if model is None:
 
-        return "Model not trained", 0.0, hand_box
+        return (
+            "Model not loaded",
+            0.0,
+            hand_box
+        )
 
-    # --------------------------------------
-    # EXTRACT FEATURES
-    # --------------------------------------
 
-    features = extract_hog(roi)
+    features = extract_hog(
+        roi
+    )
 
-    # --------------------------------------
-    # PREDICTION
-    # --------------------------------------
 
-    prediction = model.predict([features])[0]
+    prediction_index = model.predict(
+        [features]
+    )[0]
 
-    # --------------------------------------
+
+    prediction = classes[
+        int(prediction_index)
+    ]
+
+
+    # ========================================================
     # CONFIDENCE-LIKE SCORE
-    # --------------------------------------
+    # ========================================================
 
     confidence = 0.0
 
+
     try:
 
-        decision_scores = model.decision_function(
+        scores = model.decision_function(
             [features]
         )
 
-        if decision_scores.ndim == 2:
+        if scores.ndim == 2:
 
-            scores = decision_scores[0]
+            scores = scores[0]
 
-            # Prevent numerical overflow
-            exp_scores = np.exp(
-                scores - scores.max()
-            )
 
-            probabilities = (
-                exp_scores / exp_scores.sum()
-            )
+        exp_scores = np.exp(
+            scores - np.max(scores)
+        )
 
-            confidence = (
-                probabilities.max() * 100
-            )
+        probabilities = (
+            exp_scores /
+            np.sum(exp_scores)
+        )
+
+
+        confidence = (
+            float(np.max(probabilities))
+            * 100
+        )
+
 
     except Exception:
 
         confidence = 0.0
 
-    return prediction, confidence, hand_box
+
+    return (
+        prediction,
+        confidence,
+        hand_box
+    )
 
 
-# ==========================================
-# GENERATE VIDEO FRAMES
-# ==========================================
+# ============================================================
+# VIDEO STREAM
+# ============================================================
 
 def generate_frames():
 
     global latest_sign
+
 
     while True:
 
         with lock:
 
             active = camera_active
+
             cam = camera
+
 
         if not active or cam is None:
 
             break
 
+
         success, frame = cam.read()
+
 
         if not success:
 
             break
 
-        # Mirror camera
-        frame = cv2.flip(frame, 1)
 
-        # ==================================
-        # DETECT SIGN
-        # ==================================
-
-        sign, confidence, hand_box = detect_hand_sign(
-            frame
+        # Mirror webcam
+        frame = cv2.flip(
+            frame,
+            1
         )
+
+
+        sign, confidence, hand_box = (
+            detect_hand_sign(frame)
+        )
+
 
         with lock:
 
             latest_sign = sign
 
-        # ==================================
+
+        # ====================================================
         # DRAW HAND BOX
-        # ==================================
+        # ====================================================
 
         if hand_box is not None:
 
             x1, y1, x2, y2 = hand_box
 
-            # Green box around actual hand
+
             cv2.rectangle(
+
                 frame,
+
                 (x1, y1),
+
                 (x2, y2),
+
                 (0, 255, 0),
+
                 2
             )
 
-            # ----------------------------------
-            # MODEL NOT TRAINED
-            # ----------------------------------
 
-            if sign == "Model not trained":
+            label = (
+                f"{sign}  "
+                f"{confidence:.1f}%"
+            )
 
-                label = "Model not trained"
 
-            else:
+            cv2.putText(
 
-                label = f"{sign}  {confidence:.1f}%"
-
-            text_y = max(30, y1 - 10)
-
-            text_size = cv2.getTextSize(
-                label,
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.7,
-                2
-            )[0]
-
-            # Black background
-            cv2.rectangle(
                 frame,
+
+                label,
+
                 (
                     x1,
-                    text_y - text_size[1] - 10
+                    max(30, y1 - 10)
                 ),
-                (
-                    x1 + text_size[0] + 10,
-                    text_y + 5
-                ),
-                (0, 0, 0),
-                -1
-            )
 
-            # Prediction text
-            cv2.putText(
-                frame,
-                label,
-                (x1 + 5, text_y),
                 cv2.FONT_HERSHEY_SIMPLEX,
-                0.7,
+
+                0.8,
+
                 (0, 255, 0),
+
                 2
             )
+
 
         else:
 
-            # No hand message
             cv2.putText(
+
                 frame,
+
                 "No hand detected",
+
                 (30, 50),
+
                 cv2.FONT_HERSHEY_SIMPLEX,
+
                 0.8,
+
                 (0, 255, 255),
+
                 2
             )
 
-        # ==================================
-        # ENCODE FRAME
-        # ==================================
+
+        # ====================================================
+        # JPEG
+        # ====================================================
 
         ret, buffer = cv2.imencode(
             ".jpg",
             frame
         )
 
+
         if not ret:
 
             continue
 
+
         frame_bytes = buffer.tobytes()
 
+
         yield (
+
             b"--frame\r\n"
+
             b"Content-Type: image/jpeg\r\n\r\n"
+
             + frame_bytes
+
             + b"\r\n"
         )
 
 
-# ==========================================
-# GET LATEST SIGN
-# ==========================================
+# ============================================================
+# LATEST SIGN
+# ============================================================
 
 def get_latest_sign():
 

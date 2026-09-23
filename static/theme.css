@@ -1,0 +1,380 @@
+:root {
+    color-scheme: light;
+    --page-bg: #f5f7fb;
+    --surface: #ffffff;
+    --surface-muted: #f8fafc;
+    --text: #172033;
+    --text-muted: #64748b;
+    --border: #dbe3ee;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --accent: #0f9f8c;
+    --focus: rgba(37, 99, 235, 0.2);
+    --shadow: 0 12px 30px rgba(20, 40, 80, 0.08);
+    --page-background:
+        radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.12), transparent 30%),
+        radial-gradient(circle at 90% 80%, rgba(0, 191, 165, 0.12), transparent 30%),
+        #f7faff;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --page-bg: #111827;
+    --surface: #1f2937;
+    --surface-muted: #172033;
+    --text: #f3f4f6;
+    --text-muted: #aab5c5;
+    --border: #374151;
+    --primary: #60a5fa;
+    --primary-hover: #93c5fd;
+    --accent: #5eead4;
+    --focus: rgba(96, 165, 250, 0.28);
+    --shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+    --page-background:
+        radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.16), transparent 32%),
+        radial-gradient(circle at 90% 80%, rgba(15, 159, 140, 0.14), transparent 32%),
+        #111827;
+}
+
+html {
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body {
+    background: var(--page-background) !important;
+    background-attachment: fixed;
+    color: var(--text) !important;
+}
+
+header,
+.login-box,
+.login-container,
+.about-card,
+.how-it-works,
+.contact-info,
+.contact-form,
+.step,
+.feature-card {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+    box-shadow: var(--shadow);
+}
+
+header {
+    border-bottom-color: var(--border) !important;
+}
+
+p,
+.subtitle,
+.heading p,
+header p,
+.about-heading p,
+.contact-heading p,
+.about-card p,
+.contact-info > p,
+.info-item p,
+.step p,
+.feature-card p {
+    color: var(--text-muted) !important;
+}
+
+input,
+textarea,
+#meaning {
+    background: var(--surface-muted) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--text-muted);
+}
+
+input:focus,
+textarea:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px var(--focus);
+}
+
+h1,
+h2,
+h3,
+h4,
+header h1,
+.header-title h1,
+.login-box h1,
+.login-box h2 {
+    color: var(--text) !important;
+}
+
+button,
+a {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.btn,
+.nav-btn {
+    background: transparent !important;
+    color: var(--text) !important;
+}
+
+.btn:hover,
+.nav-btn:hover,
+.nav-btn.active {
+    background: color-mix(in srgb, var(--primary) 12%, transparent) !important;
+    color: var(--primary) !important;
+}
+
+#openBtn,
+.login-btn,
+.send-btn,
+.start-btn,
+.start-section .start-btn,
+.login {
+    background: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+#openBtn:hover,
+.login-btn:hover,
+.send-btn:hover,
+.start-btn:hover,
+.login:hover {
+    background: var(--primary-hover) !important;
+}
+
+#closeBtn {
+    background: var(--border) !important;
+    color: var(--text) !important;
+}
+
+.meaning-section h2 {
+    color: var(--text-muted) !important;
+}
+
+#meaning {
+    color: var(--primary) !important;
+}
+
+.theme-toggle {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 20;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface) !important;
+    color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    box-shadow: var(--shadow);
+    font-size: 18px;
+    line-height: 1;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-2px);
+    background: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+@media (max-width: 600px) {
+    .theme-toggle {
+        right: 14px;
+        bottom: 14px;
+    }
+}
+
+/* Shared page proportions */
+header {
+    min-height: 82px !important;
+    height: auto !important;
+    padding: 14px 40px !important;
+    gap: 18px;
+}
+
+header > div:first-child,
+.logo-container {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+header img {
+    width: 68px !important;
+    height: 50px !important;
+    object-fit: contain;
+}
+
+.header-title {
+    margin-left: 0 !important;
+}
+
+.header-title h1,
+header h1 {
+    font-size: 24px !important;
+    line-height: 1.15;
+    margin-bottom: 3px !important;
+}
+
+.header-title p,
+header p {
+    font-size: 12px !important;
+    line-height: 1.3;
+}
+
+.nav-buttons {
+    margin-left: auto !important;
+    display: flex;
+    align-items: center;
+    gap: 4px !important;
+}
+
+.nav-buttons button,
+.auth-buttons button {
+    min-height: 38px;
+    padding: 9px 14px !important;
+    border-radius: 7px !important;
+    font-size: 13px !important;
+    white-space: nowrap;
+}
+
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 7px !important;
+    margin-left: 12px !important;
+}
+
+.nav-buttons .active,
+.auth-buttons .active {
+    background: color-mix(in srgb, var(--primary) 14%, transparent) !important;
+    color: var(--primary) !important;
+    box-shadow: inset 0 -2px 0 var(--primary);
+}
+
+.nav-buttons button {
+    position: relative;
+}
+
+.nav-buttons .active::after {
+    content: "";
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 3px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--primary);
+}
+
+.main,
+.about-container,
+.contact-container {
+    width: min(100%, 1120px);
+    margin: 0 auto !important;
+    padding: 42px 32px !important;
+}
+
+.about-heading,
+.contact-heading {
+    margin-bottom: 36px !important;
+}
+
+.about-heading h2,
+.contact-heading h2 {
+    font-size: 38px !important;
+    line-height: 1.15;
+}
+
+.about-heading p,
+.contact-heading p {
+    font-size: 16px !important;
+}
+
+.about-card,
+.contact-info,
+.contact-form,
+.how-it-works {
+    padding: 24px !important;
+}
+
+.about-card h3,
+.contact-info h3,
+.contact-form h3,
+.how-it-works h3 {
+    font-size: 19px !important;
+}
+
+.login-container {
+    width: min(380px, calc(100% - 32px)) !important;
+}
+
+.heading {
+    padding-left: 0 !important;
+}
+
+.login-box {
+    width: 100% !important;
+    padding: 26px !important;
+}
+
+@media (max-width: 800px) {
+    header {
+        padding: 14px 24px !important;
+    }
+
+    .nav-buttons {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        margin-left: 0 !important;
+    }
+
+    .auth-buttons {
+        margin-left: auto !important;
+    }
+}
+
+@media (max-width: 600px) {
+    header {
+        padding: 12px 16px !important;
+        gap: 10px;
+    }
+
+    header img {
+        width: 56px !important;
+        height: 42px !important;
+    }
+
+    .header-title h1,
+    header h1 {
+        font-size: 20px !important;
+    }
+
+    .header-title p,
+    header p {
+        font-size: 10px !important;
+    }
+
+    .nav-buttons button,
+    .auth-buttons button {
+        padding: 8px 9px !important;
+        font-size: 11px !important;
+    }
+
+    .main,
+    .about-container,
+    .contact-container {
+        padding: 30px 18px !important;
+    }
+
+    .about-heading h2,
+    .contact-heading h2 {
+        font-size: 32px !important;
+    }
+}

@@ -178,8 +178,11 @@
         }
     }
 </style>
+<link rel="stylesheet" href="/static/theme.css">
 </head>
 <body>
+
+    <button class="theme-toggle" type="button" aria-label="Switch theme">&#9789;</button>
 
     <header>
         <div>
@@ -197,7 +200,7 @@
         </div>
 
         <div class="auth-buttons">
-            <button class="btn">SIGN IN</button>
+            <button class="btn" onclick="window.location.href='/sign-in'">SIGN IN</button>
             <button class="btn" onclick="window.location.href='/login'">LOGIN</button>
         </div>
         
@@ -299,6 +302,7 @@
             meaningBox.value = "No hand detected";
         });
     </script>
+    <script src="/static/theme.js"></script>
 
 </body>
 </html>

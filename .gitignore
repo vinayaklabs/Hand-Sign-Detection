@@ -1,23 +1,28 @@
-# Dataset
-Dataset/
-
-# Trained machine-learning model
-asl_model.pkl
-
-# Python cache
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+
+# Datasets
+Dataset/
+asl_alphabet_train/
+asl_alphabet_test/
+
+# Training models not used by the application
+asl_model.pkl
+motion_model.pkl
+
+# User database
+users.db
+user.db
 
 # Temporary files
 tempCodeRunnerFile.py
 
-# Local databases
-users.db
-user.db
-
-# VS Code
+# IDE
 .vscode/
+.idea/
 
-# Environment
-venv/
-.env
+# OS
+.DS_Store
+Thumbs.db
